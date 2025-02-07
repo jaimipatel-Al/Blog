@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { Form, Field } from 'vee-validate'
+import * as yup from 'yup'
+
+const schema = yup.object({
+  Title: yup.string().required().min(5).max(100),
+  Description: yup.string().required().min(10).max(1000),
+})
 
 const addBlog = () => {
   console.log('Hello')
@@ -16,23 +23,28 @@ const addBlog = () => {
         <RouterLink to="/" class="link"> Back to Home</RouterLink>
       </p>
 
-      <form @submit.prevent="addBlog">
+      <Form @submit="addBlog" :validation-schema="schema" v-slot="{ errors }">
         <div>
           <label for="title" class="label">Title</label>
-          <input type="text" id="title" class="input" placeholder="Enter Your Title" />
+          <Field type="text" id="title" class="input" placeholder="Enter Your Title" name="Title" />
+          <p class="error-message">{{ errors?.Title }}</p>
         </div>
 
         <div>
           <label for="blog" class="label">Blog Description</label>
-          <textarea
-            id="blog"
-            class="input h-40"
-            placeholder="Enter Your Blog Description"
-          ></textarea>
+          <Field v-slot="{ field }" name="Description">
+            <textarea
+              v-bind="field"
+              id="blog"
+              class="input h-40"
+              placeholder="Enter Your Blog Description"
+            ></textarea>
+          </Field>
+          <p class="error-message">{{ errors?.Description }}</p>
         </div>
 
         <button type="submit" class="button mt-10">Add Blog</button>
-      </form>
+      </Form>
     </div>
   </div>
 </template>

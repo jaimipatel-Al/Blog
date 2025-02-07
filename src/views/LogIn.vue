@@ -2,6 +2,20 @@
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid'
 import { RouterLink } from 'vue-router'
 import { ref } from 'vue'
+import { Form, Field } from 'vee-validate'
+import * as yup from 'yup'
+
+const schema = yup.object({
+  Email: yup.string().required().email(),
+  Password: yup
+    .string()
+    .required()
+    .min(8)
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+    ),
+})
 
 const isPassword: boolean = ref(false)
 const login = () => {
@@ -18,17 +32,25 @@ const login = () => {
         <RouterLink to="/signup" class="link">Sign Up</RouterLink>
       </p>
 
-      <form @submit.prevent="login">
+      <Form @submit="login" :validation-schema="schema" v-slot="{ errors }">
         <div>
-          <label for="email" class="label">Email Address</label>
-          <input type="email" id="email" class="input" placeholder="Enter Your Email Address" />
+          <label for="mail" class="label">Email Address</label>
+          <Field
+            type="email"
+            name="Email"
+            id="email"
+            class="input"
+            placeholder="Enter Your Email Address"
+          />
+          <p class="error-message">{{ errors?.Email }}</p>
         </div>
 
         <div>
           <label for="password" class="label">Password</label>
           <div class="input flex items-center justify-between">
-            <input
+            <Field
               :type="isPassword ? 'text' : 'password'"
+              name="Password"
               id="password"
               class="text-gray-900 placeholder:text-gray-400 focus:outline-none text-xl w-full"
               placeholder="Enter Your Password"
@@ -38,6 +60,7 @@ const login = () => {
               <EyeIcon v-else class="password-icon" />
             </div>
           </div>
+          <p class="error-message">{{ errors?.Password }}</p>
         </div>
 
         <div class="flex items-center space-x-3 my-10 text-lg text-gray-500 font-semibold">
@@ -46,7 +69,7 @@ const login = () => {
         </div>
 
         <button type="submit" class="button">Login</button>
-      </form>
+      </Form>
     </div>
     <img src="@/assets/img/login.png" alt="Login" />
   </div>
