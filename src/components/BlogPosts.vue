@@ -6,11 +6,11 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/solid'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
+import CommentBox from '@/components/CommentBox.vue'
+import PostComment from '@/components/PostComment.vue'
 import { ref } from 'vue'
 
 const isComment: boolean = ref(false)
-
-const sendComment = () => {}
 </script>
 
 <template>
@@ -52,16 +52,25 @@ const sendComment = () => {}
               @click="isComment = false"
             />
           </div>
-          <form @submit.prevent="sendComment">
-            <textarea
-              id="blog"
-              class="input h-32"
-              placeholder="Enter Your Blog Description"
-            ></textarea>
-            <div class="flex justify-end">
-              <button type="submit" class="sm-button">Add Blog</button>
+          <div>
+            <div
+              v-for="i in 2"
+              :key="i"
+              class="border border-gray-200 shadow shadow-sm rounded rounded-xl p-3 m-5 bg-slate-50"
+            >
+              <CommentBox />
+
+              <div
+                v-for="i in 2"
+                :key="i"
+                class="border border-gray-200 shadow shadow-sm rounded rounded-xl p-3 m-5 bg-white"
+              >
+                <CommentBox :is-nested="false" />
+              </div>
             </div>
-          </form>
+            <hr class="my-3" />
+          </div>
+          <PostComment />
         </div>
       </div>
     </div>
