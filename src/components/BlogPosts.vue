@@ -34,7 +34,7 @@ const isComment: boolean = ref(false)
         </p>
         <hr class="my-3" />
         <div class="font-semibold flex items-center">
-          <HeartOutlineIcon class="w-8 text-red-600 cursor-pointer mx-2" v-if="i % 2" />
+          <HeartOutlineIcon class="w-8 text-red-600 cursor-pointer mx-2" v-if="false" />
           <HeartIcon class="w-8 text-red-600 cursor-pointer mx-2" v-else />
           0 Like |
           <ChatBubbleBottomCenterTextIcon
