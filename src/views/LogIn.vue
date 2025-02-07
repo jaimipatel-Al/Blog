@@ -12,16 +12,16 @@ const login = () => {
 <template>
   <div class="container mx-auto my-10 flex justify-center space-x-10" style="height: 80vh">
     <div class="shadow-2xl p-10 m-10 rounded rounded-3xl">
-      <h2 class="text-5xl text-gray-900 font-bold">Login</h2>
-      <p class="text-gray-500 font-semibold text-lg my-2">
+      <h2 class="main-title">Login</h2>
+      <p class="semi-title">
         Doesn't have an account yet?
-        <RouterLink to="/signup" class="underline text-blue-700">Sign Up</RouterLink>
+        <RouterLink to="/signup" class="link">Sign Up</RouterLink>
       </p>
 
       <form @submit.prevent="login">
         <div>
           <label for="email" class="label">Email Address</label>
-          <input type="text" id="email" class="input" placeholder="Enter Your Email Address" />
+          <input type="email" id="email" class="input" placeholder="Enter Your Email Address" />
         </div>
 
         <div>
@@ -45,11 +45,7 @@ const login = () => {
           <label for="remember">Remember Me</label><br />
         </div>
 
-        <button
-          class="bg-blue-700 text-2xl font-bold text-white p-5 w-full rounded rounded-lg hover:bg-blue-600 disabled:bg-blue-400 disabled:cursor-not-allowed"
-        >
-          Login
-        </button>
+        <button type="submit" class="button">Login</button>
       </form>
     </div>
     <img src="@/assets/img/login.png" alt="Login" />

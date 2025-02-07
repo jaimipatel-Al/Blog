@@ -13,16 +13,16 @@ const signup = () => {
 <template>
   <div class="container mx-auto my-10 flex justify-center space-x-10" style="height: 80vh">
     <div class="shadow-2xl py-6 my-4 px-10 mx-10 rounded rounded-3xl w-full">
-      <h2 class="text-5xl text-gray-900 font-bold">Sign Up</h2>
-      <p class="text-gray-500 font-semibold text-lg my-2">
+      <h2 class="main-title">Sign Up</h2>
+      <p class="semi-title">
         Already have an account?
-        <RouterLink to="/login" class="underline text-blue-700">Login</RouterLink>
+        <RouterLink to="/login" class="link">Login</RouterLink>
       </p>
 
       <form @submit.prevent="signup">
         <div>
           <label for="email" class="label">Email Address</label>
-          <input type="text" id="email" class="input" placeholder="Enter Your Email Address" />
+          <input type="email" id="email" class="input" placeholder="Enter Your Email Address" />
         </div>
 
         <div>
@@ -57,11 +57,7 @@ const signup = () => {
           </div>
         </div>
 
-        <button
-          class="mt-10 bg-blue-700 text-2xl font-bold text-white p-5 w-full rounded rounded-lg hover:bg-blue-600 disabled:bg-blue-400 disabled:cursor-not-allowed"
-        >
-          Sign Up
-        </button>
+        <button type="submit" class="mt-10 button">Sign Up</button>
       </form>
     </div>
     <img src="@/assets/img/signup.png" alt="Login" />
