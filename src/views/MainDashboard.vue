@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { PlusIcon, ArrowLeftStartOnRectangleIcon } from '@heroicons/vue/24/solid'
 import { useRouter } from 'vue-router'
+import BlogPosts from '@/components/BlogPosts.vue'
 
 const router = useRouter()
 
@@ -26,6 +27,7 @@ const logout = () => {
         @click="logout()"
       />
     </nav>
+    <BlogPosts />
     <button
       class="button rounded rounded-full w-20 absolute bottom-5 right-5"
       @click="createBlog()"
