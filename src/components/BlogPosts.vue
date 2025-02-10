@@ -80,6 +80,20 @@ const addComment = async (post, text: string) => {
     })
 }
 
+const likePost = async (post) => {
+  const payload = {
+    targetId: post._id,
+    type: 'post',
+  }
+  await Axios.post(api.likes, payload)
+    .then(() => {
+      post.isLiked = !post.isLiked
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+}
+
 onMounted(() => {
   getPost()
 })
@@ -110,8 +124,16 @@ onMounted(() => {
         <p class="text-gray-800 text-lg">{{ post.description }}</p>
         <hr class="my-3" />
         <div class="font-semibold flex items-center">
-          <HeartIcon v-if="post.isLiked" class="w-8 text-red-600 cursor-pointer mx-2" />
-          <HeartOutlineIcon v-else class="w-8 text-red-600 cursor-pointer mx-2" />
+          <HeartIcon
+            v-if="post.isLiked"
+            class="w-8 text-red-600 cursor-pointer mx-2"
+            @click="likePost(post)"
+          />
+          <HeartOutlineIcon
+            v-else
+            class="w-8 text-red-600 cursor-pointer mx-2"
+            @click="likePost(post)"
+          />
           {{ post.likesCount }} Like |
           <ChatBubbleBottomCenterTextIcon
             class="w-8 text-green-600 cursor-pointer mx-2"

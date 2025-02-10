@@ -5,6 +5,7 @@ const requests = {
   postList: `posts/list-post`,
   addComment: `comments/add-comment`,
   getComments: `comments/get-comments/`,
+  likes: `/likes/like-unlike`,
 }
 
 export default requests
