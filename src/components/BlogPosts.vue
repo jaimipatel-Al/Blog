@@ -43,7 +43,9 @@ const getComment = async (post) => {
   await Axios.get(`${api.getComments}${post._id}`)
     .then((response) => {
       const res = response.data
-      post.comments = res.data
+      post.comments = res.data.map((e) => {
+        return { ...e, isAddingComment: false }
+      })
       console.log(post.comments)
     })
     .catch((err) => {
@@ -160,14 +162,15 @@ onMounted(() => {
               :key="comment._id"
               class="border border-gray-200 shadow shadow-sm rounded rounded-xl p-3 m-5 bg-slate-50"
             >
-              <CommentBox :comment="comment" />
+              <CommentBox :comment="comment" :postId="post._id" />
 
               <div
+                v-if="comment.isComment"
                 v-for="reply in comment.replies"
                 :key="reply._id"
                 class="border border-gray-200 shadow shadow-sm rounded rounded-xl p-3 m-5 bg-white"
               >
-                <CommentBox :is-nested="false" />
+                <CommentBox :is-nested="false" :comment="reply" :postId="post._id" />
               </div>
             </div>
             <hr class="my-3" />
