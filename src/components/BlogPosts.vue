@@ -13,9 +13,11 @@ import { onMounted, ref } from 'vue'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import { formatDate } from '@/composables/format'
+import toast from '@/plugin/toast'
 
 const isComment = ref(false)
 const isLoading = ref(false)
+const isCommentLoading = ref(false)
 const posts = ref([])
 
 const getPost = async () => {
@@ -25,13 +27,35 @@ const getPost = async () => {
     .then((response) => {
       const res = response.data
       posts.value = res.data
-      console.log(res.data)
     })
     .catch((err) => {
       console.log(err)
     })
     .finally(() => {
       isLoading.value = false
+    })
+}
+
+const addComment = async (id: string, text: string) => {
+  isCommentLoading.value = true
+
+  const comment = {
+    postId: id,
+    text: text,
+  }
+
+  await Axios.post(api.addComment, comment)
+    .then((response) => {
+      const res = response.data
+      toast.success(res?.message ?? 'Comment Post Success!')
+      return true
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message ?? "Comment Can't Post!")
+      return false
+    })
+    .finally(() => {
+      isCommentLoading.value = false
     })
 }
 
@@ -51,7 +75,7 @@ onMounted(() => {
     <div v-else class="w-3/5 mx-auto my-10" style="height: 88vh">
       <div
         v-for="post in posts"
-        :key="post.id"
+        :key="post._id"
         class="my-10 shadow shadow-2xl rounded rounded-lg p-5 bg-white"
       >
         <div class="flex items-center space-x-5">
@@ -101,7 +125,7 @@ onMounted(() => {
             </div>
             <hr class="my-3" />
           </div>
-          <PostComment />
+          <PostComment @addComment="(text) => addComment(post._id, text)" />
         </div>
       </div>
     </div>
