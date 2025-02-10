@@ -18,6 +18,7 @@ import toast from '@/plugin/toast'
 const isComment = ref(false)
 const isLoading = ref(false)
 const isCommentLoading = ref(false)
+const isAddingComment = ref(false)
 const posts = ref([])
 
 const getPost = async () => {
@@ -26,7 +27,9 @@ const getPost = async () => {
   await Axios.get(api.postList)
     .then((response) => {
       const res = response.data
-      posts.value = res.data
+      posts.value = res.data.map((e) => {
+        return { ...e, isComment: false }
+      })
     })
     .catch((err) => {
       console.log(err)
@@ -36,11 +39,28 @@ const getPost = async () => {
     })
 }
 
-const addComment = async (id: string, text: string) => {
+const getComment = async (post) => {
   isCommentLoading.value = true
 
+  await Axios.get(`${api.getComments}${post._id}`)
+    .then((response) => {
+      const res = response.data
+      post.comments = res.data
+      console.log(post.comments)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+    .finally(() => {
+      isCommentLoading.value = false
+    })
+}
+
+const addComment = async (post, text: string) => {
+  isAddingComment.value = true
+
   const comment = {
-    postId: id,
+    postId: post._id,
     text: text,
   }
 
@@ -48,6 +68,7 @@ const addComment = async (id: string, text: string) => {
     .then((response) => {
       const res = response.data
       toast.success(res?.message ?? 'Comment Post Success!')
+      getComment(post, true)
       return true
     })
     .catch((er) => {
@@ -55,7 +76,7 @@ const addComment = async (id: string, text: string) => {
       return false
     })
     .finally(() => {
-      isCommentLoading.value = false
+      isAddingComment.value = false
     })
 }
 
@@ -81,7 +102,7 @@ onMounted(() => {
         <div class="flex items-center space-x-5">
           <UserIcon class="w-14 rounded rounded-full p-3 bg-gray-400" />
           <div>
-            <h2 class="font-semibold text-xl">{{ post.userId.userName }}</h2>
+            <h2 class="font-semibold text-xl">{{ post.user.userName }}</h2>
             <p class="text-sm text-gray-600 font-semibold">{{ formatDate(post.createdAt) }}</p>
           </div>
         </div>
@@ -89,35 +110,35 @@ onMounted(() => {
         <p class="text-gray-800 text-lg">{{ post.description }}</p>
         <hr class="my-3" />
         <div class="font-semibold flex items-center">
-          <HeartOutlineIcon class="w-8 text-red-600 cursor-pointer mx-2" v-if="false" />
-          <HeartIcon class="w-8 text-red-600 cursor-pointer mx-2" v-else />
+          <HeartIcon v-if="post.isLiked" class="w-8 text-red-600 cursor-pointer mx-2" />
+          <HeartOutlineIcon v-else class="w-8 text-red-600 cursor-pointer mx-2" />
           {{ post.likesCount }} Like |
           <ChatBubbleBottomCenterTextIcon
             class="w-8 text-green-600 cursor-pointer mx-2"
-            @click="isComment = !isComment"
+            @click="!post.isComment ? getComment(post) : '', (post.isComment = true)"
           />
           {{ post.commentsCount }} Comment
         </div>
-        <div v-if="isComment">
+        <div v-if="post.isComment">
           <hr class="my-3" />
           <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl">Comments</h2>
             <XMarkIcon
               class="w-14 rounded rounded-full p-3 cursor-pointer hover:bg-gray-100"
-              @click="isComment = false"
+              @click="post.isComment = false"
             />
           </div>
           <div>
             <div
-              v-for="i in 2"
-              :key="i"
+              v-for="comment in post.comments"
+              :key="comment._id"
               class="border border-gray-200 shadow shadow-sm rounded rounded-xl p-3 m-5 bg-slate-50"
             >
-              <CommentBox />
+              <CommentBox :comment="comment" />
 
               <div
-                v-for="i in 2"
-                :key="i"
+                v-for="reply in comment.replies"
+                :key="reply._id"
                 class="border border-gray-200 shadow shadow-sm rounded rounded-xl p-3 m-5 bg-white"
               >
                 <CommentBox :is-nested="false" />
@@ -125,7 +146,7 @@ onMounted(() => {
             </div>
             <hr class="my-3" />
           </div>
-          <PostComment @addComment="(text) => addComment(post._id, text)" />
+          <PostComment @addComment="(text) => addComment(post, text)" />
         </div>
       </div>
     </div>
