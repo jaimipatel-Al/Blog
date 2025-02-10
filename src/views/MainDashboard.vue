@@ -3,15 +3,19 @@
 import { PlusIcon, ArrowLeftStartOnRectangleIcon } from '@heroicons/vue/24/solid'
 import { useRouter } from 'vue-router'
 import BlogPosts from '@/components/BlogPosts.vue'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const createBlog = () => {
   router.push('/add-blog')
 }
 
 const logout = () => {
-  console.log('Hello')
+  authStore.logOut();
+  authStore.removeToken();
+  router.push('/login')
 }
 </script>
 

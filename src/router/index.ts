@@ -40,7 +40,7 @@ const router = createRouter({
 const currentUser = () => {
   return new Promise((resolve, reject) => {
     const authStore = useAuthStore()
-    const token = authStore.userData
+    const token = authStore.token
     resolve(token)
     reject
   })

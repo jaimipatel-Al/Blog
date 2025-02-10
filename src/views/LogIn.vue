@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid'
-import { RouterLink } from 'vue-router'
-import { ref } from 'vue'
+import { EyeIcon, EyeSlashIcon, ArrowPathIcon } from '@heroicons/vue/24/solid'
+import { RouterLink, useRouter } from 'vue-router'
+import { onMounted, ref } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
+import Axios from '@/plugin/axios'
+import api from '@/plugin/apis'
+import toast from '@/plugin/toast'
+import { useAuthStore } from '@/stores/authStore'
 
 const schema = yup.object({
   Email: yup.string().required().email(),
@@ -12,15 +16,59 @@ const schema = yup.object({
     .required()
     .min(8)
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
       'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
     ),
 })
 
-const isPassword: boolean = ref(false)
-const login = () => {
-  console.log('Hello')
+const router = useRouter()
+const authStore = useAuthStore()
+
+const isRemember = ref(false)
+const isPassword = ref(false)
+const isLogin = ref(false)
+const userName = ref('')
+const password = ref('')
+
+const login = async () => {
+  isLogin.value = true
+
+  const credentials = {
+    userName: userName.value,
+    password: password.value,
+  }
+
+  await Axios.post(api.login, credentials)
+    .then((response) => {
+      const res = response.data
+
+      authStore.loginUser(credentials)
+      authStore.storeToken(res.data.token)
+
+      if (isRemember.value) authStore.sessionStore(credentials)
+      else authStore.sessionRemove()
+
+      toast.success(res?.message ?? 'User Login Success!')
+      router.push('/')
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message ?? "User Can't Login!")
+    })
+    .finally(() => {
+      isLogin.value = false
+    })
 }
+
+onMounted(() => {
+  const authCredentials = sessionStorage.getItem('authCredentials')
+
+  if (authCredentials) {
+    const credentials = JSON.parse(authCredentials)
+    userName.value = credentials.userName
+    password.value = credentials.password
+    isRemember.value = true
+  }
+})
 </script>
 
 <template>
@@ -36,6 +84,7 @@ const login = () => {
         <div>
           <label for="mail" class="label">Email Address</label>
           <Field
+            v-model="userName"
             type="email"
             name="Email"
             id="email"
@@ -49,6 +98,7 @@ const login = () => {
           <label for="password" class="label">Password</label>
           <div class="input flex items-center justify-between">
             <Field
+              v-model="password"
               :type="isPassword ? 'text' : 'password'"
               name="Password"
               id="password"
@@ -64,11 +114,18 @@ const login = () => {
         </div>
 
         <div class="flex items-center space-x-3 my-10 text-lg text-gray-500 font-semibold">
-          <input type="checkbox" id="remember" class="w-6 h-6 cursor-pointer" />
+          <input
+            v-model="isRemember"
+            type="checkbox"
+            id="remember"
+            class="w-6 h-6 cursor-pointer"
+          />
           <label for="remember">Remember Me</label><br />
         </div>
 
-        <button type="submit" class="button">Login</button>
+        <button type="submit" class="button" :disabled="isLogin">
+          Login <ArrowPathIcon v-if="isLogin" class="w-6 mx-3" />
+        </button>
       </Form>
     </div>
     <img src="@/assets/img/login.png" alt="Login" />
