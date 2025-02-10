@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { HeartIcon, ChatBubbleBottomCenterTextIcon, XMarkIcon } from '@heroicons/vue/24/solid'
+import {
+  HeartIcon,
+  ChatBubbleBottomCenterTextIcon,
+  XMarkIcon,
+  TrashIcon,
+} from '@heroicons/vue/24/solid'
 import { UserIcon, HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import PostComment from '@/components/PostComment.vue'
 import { ref } from 'vue'
@@ -7,6 +12,9 @@ import { formatDate } from '@/composables/format'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import toast from '@/plugin/toast'
+import { useAuthStore } from '@/stores/authStore'
+
+const authStore = useAuthStore()
 
 const props = defineProps({
   comment: { type: Object, default: () => {} },
@@ -55,12 +63,18 @@ const addReplay = async (text: string) => {
 
 <template>
   <div v-if="comment">
-    <div class="flex items-center space-x-3">
-      <UserIcon class="w-10 rounded rounded-full p-2 bg-gray-200 border border-gray-500" />
-      <div>
-        <h2 class="font-semibold text-md">{{ comment.userId }}</h2>
-        <p class="text-xs text-gray-600 font-semibold">{{ formatDate(comment.createdAt) }}</p>
+    <div class="flex justify-between">
+      <div class="flex items-center space-x-3">
+        <UserIcon class="w-10 rounded rounded-full p-2 bg-gray-200 border border-gray-500" />
+        <div>
+          <h2 class="font-semibold text-md">{{ comment.userId }}</h2>
+          <p class="text-xs text-gray-600 font-semibold">{{ formatDate(comment.createdAt) }}</p>
+        </div>
       </div>
+      <TrashIcon
+        v-if="authStore?.userData?.userId == comment.userId"
+        class="text-red-500 w-12 h-10 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
+      />
     </div>
     <p class="text-lg my-3">{{ comment.text }}</p>
     <div class="font-semibold flex items-center">

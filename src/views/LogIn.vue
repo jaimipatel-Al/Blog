@@ -42,6 +42,8 @@ const login = async () => {
     .then((response) => {
       const res = response.data
 
+      credentials.userId = res.data._id
+
       authStore.loginUser(credentials)
       authStore.storeToken(res.data.token)
 

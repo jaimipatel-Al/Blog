@@ -5,6 +5,7 @@ import {
   HeartIcon,
   XMarkIcon,
   ArrowPathIcon,
+  TrashIcon,
 } from '@heroicons/vue/24/solid'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import CommentBox from '@/components/CommentBox.vue'
@@ -15,6 +16,9 @@ import api from '@/plugin/apis'
 import { formatDate } from '@/composables/format'
 import toast from '@/plugin/toast'
 import { RouterLink } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
+
+const authStore = useAuthStore()
 
 const isLoading = ref(false)
 const posts = ref([])
@@ -113,12 +117,18 @@ onMounted(() => {
         :key="post._id"
         class="my-10 shadow shadow-2xl rounded rounded-lg p-5 bg-white"
       >
-        <div class="flex items-center space-x-5">
-          <UserIcon class="w-14 rounded rounded-full p-3 bg-gray-400" />
-          <div>
-            <h2 class="font-semibold text-xl">{{ post.user.userName }}</h2>
-            <p class="text-sm text-gray-600 font-semibold">{{ formatDate(post.createdAt) }}</p>
+        <div class="flex justify-between">
+          <div class="flex items-center space-x-5">
+            <UserIcon class="w-14 rounded rounded-full p-3 bg-gray-400" />
+            <div>
+              <h2 class="font-semibold text-xl">{{ post.user.userName }}</h2>
+              <p class="text-sm text-gray-600 font-semibold">{{ formatDate(post.createdAt) }}</p>
+            </div>
           </div>
+          <TrashIcon
+            v-if="authStore?.userData?.userId == post.userId"
+            class="text-red-600 w-14 h-12 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
+          />
         </div>
         <h3 class="text-2xl font-bold mt-5 mb-3">{{ post.title }}</h3>
         <p class="text-gray-800 text-lg">{{ post.description }}</p>
