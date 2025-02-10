@@ -14,11 +14,9 @@ import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import { formatDate } from '@/composables/format'
 import toast from '@/plugin/toast'
+import { RouterLink } from 'vue-router'
 
-const isComment = ref(false)
 const isLoading = ref(false)
-const isCommentLoading = ref(false)
-const isAddingComment = ref(false)
 const posts = ref([])
 
 const getPost = async () => {
@@ -28,7 +26,7 @@ const getPost = async () => {
     .then((response) => {
       const res = response.data
       posts.value = res.data.map((e) => {
-        return { ...e, isComment: false }
+        return { ...e, isComment: false, isAddingComment: false }
       })
     })
     .catch((err) => {
@@ -40,7 +38,7 @@ const getPost = async () => {
 }
 
 const getComment = async (post) => {
-  isCommentLoading.value = true
+  post.isCommentLoading = true
 
   await Axios.get(`${api.getComments}${post._id}`)
     .then((response) => {
@@ -52,12 +50,12 @@ const getComment = async (post) => {
       console.log(err)
     })
     .finally(() => {
-      isCommentLoading.value = false
+      post.isCommentLoading = false
     })
 }
 
 const addComment = async (post, text: string) => {
-  isAddingComment.value = true
+  post.isAddingComment = true
 
   const comment = {
     postId: post._id,
@@ -76,19 +74,19 @@ const addComment = async (post, text: string) => {
       return false
     })
     .finally(() => {
-      isAddingComment.value = false
+      post.isAddingComment = false
     })
 }
 
 const likePost = async (post) => {
+  post.isLiked = !post.isLiked
+
   const payload = {
     targetId: post._id,
     type: 'post',
   }
   await Axios.post(api.likes, payload)
-    .then(() => {
-      post.isLiked = !post.isLiked
-    })
+    .then(() => {})
     .catch((er) => {
       console.log(er)
     })
@@ -107,7 +105,7 @@ onMounted(() => {
     >
       <ArrowPathIcon class="w-12 mx-3" /> Loading...
     </div>
-    <div v-else class="w-3/5 mx-auto my-10" style="height: 88vh">
+    <div v-else-if="posts.length" class="w-3/5 mx-auto my-10" style="height: 88vh">
       <div
         v-for="post in posts"
         :key="post._id"
@@ -150,7 +148,13 @@ onMounted(() => {
               @click="post.isComment = false"
             />
           </div>
-          <div>
+          <div
+            v-if="post.isCommentLoading"
+            class="flex justify-center items-center text-md font-semibold text-gray-500 mb-5"
+          >
+            <ArrowPathIcon class="w-6 mx-3" /> Loading...
+          </div>
+          <div v-else>
             <div
               v-for="comment in post.comments"
               :key="comment._id"
@@ -168,9 +172,17 @@ onMounted(() => {
             </div>
             <hr class="my-3" />
           </div>
-          <PostComment @addComment="(text) => addComment(post, text)" />
+          <PostComment
+            @addComment="(text) => addComment(post, text)"
+            :loading="post.isAddingComment"
+          />
         </div>
       </div>
+    </div>
+    <div v-else class="text-center text-xl m-5 font-semibold">
+      <img src="@/assets/img/empty.png" alt="Login" class="h-96 w-auto mx-auto my-5" />
+      <p class="text-gray-700">No Post Avaiable</p>
+      <RouterLink to="/add-blog" class="text-blue-700 underline">Add New Post</RouterLink>
     </div>
   </div>
 </template>

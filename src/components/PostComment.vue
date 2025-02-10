@@ -2,7 +2,11 @@
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { ref } from 'vue'
+import { ArrowPathIcon } from '@heroicons/vue/24/solid'
 
+const props = defineProps({
+  loading: { type: Boolean, default: true },
+})
 const emit = defineEmits(['addComment'])
 
 const schema = yup.object({
@@ -26,7 +30,13 @@ const sendComment = async () => {
     <p class="error-message">{{ errors?.Comment }}</p>
 
     <div class="flex justify-end">
-      <button type="submit" class="sm-button">Add Comment</button>
+      <button
+        type="submit"
+        class="sm-button flex justify-center items-center"
+        :disabled="props.loading"
+      >
+        Add Comment <ArrowPathIcon v-if="props.loading" class="w-6 ml-3" />
+      </button>
     </div>
   </Form>
 </template>

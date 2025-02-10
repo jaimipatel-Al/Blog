@@ -4,6 +4,8 @@ import { UserIcon, HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outli
 import PostComment from '@/components/PostComment.vue'
 import { ref } from 'vue'
 import { formatDate } from '@/composables/format'
+import Axios from '@/plugin/axios'
+import api from '@/plugin/apis'
 
 const isComment: boolean = ref(false)
 
@@ -11,6 +13,20 @@ const props = defineProps({
   comment: { type: Object, default: () => {} },
   isNested: { type: Boolean, default: true },
 })
+
+const likeComment = async () => {
+  comment.isLiked = !comment.isLiked
+
+  const payload = {
+    targetId: comment._id,
+    type: 'comment',
+  }
+  await Axios.post(api.likes, payload)
+    .then(() => {})
+    .catch((er) => {
+      console.log(er)
+    })
+}
 </script>
 
 <template>
@@ -24,8 +40,12 @@ const props = defineProps({
     </div>
     <p class="text-lg my-3">{{ comment.text }}</p>
     <div class="font-semibold flex items-center">
-      <HeartOutlineIcon class="w-6 text-red-5600 cursor-pointer mx-2" v-if="false" />
-      <HeartIcon class="w-6 text-red-600 cursor-pointer mx-2" v-else />
+      <HeartOutlineIcon
+        v-if="false"
+        class="w-6 text-red-5600 cursor-pointer mx-2"
+        @click="likeComment()"
+      />
+      <HeartIcon v-else class="w-6 text-red-600 cursor-pointer mx-2" @click="likeComment()" />
       {{ comment.likesCount }} Like
       <span v-if="props.isNested"> | </span>
       <ChatBubbleBottomCenterTextIcon
