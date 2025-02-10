@@ -4,44 +4,75 @@ import {
   ChatBubbleBottomCenterTextIcon,
   HeartIcon,
   XMarkIcon,
+  ArrowPathIcon,
 } from '@heroicons/vue/24/solid'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import CommentBox from '@/components/CommentBox.vue'
 import PostComment from '@/components/PostComment.vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import Axios from '@/plugin/axios'
+import api from '@/plugin/apis'
+import { formatDate } from '@/composables/format'
 
-const isComment: boolean = ref(false)
+const isComment = ref(false)
+const isLoading = ref(false)
+const posts = ref([])
+
+const getPost = async () => {
+  isLoading.value = true
+
+  await Axios.get(api.postList)
+    .then((response) => {
+      const res = response.data
+      posts.value = res.data
+      console.log(res.data)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+
+onMounted(() => {
+  getPost()
+})
 </script>
 
 <template>
   <div class="w-full overflow-y-auto" style="height: 88vh">
-    <div class="w-3/5 mx-auto my-10" style="height: 88vh">
-      <div class="my-10 shadow shadow-2xl rounded rounded-lg p-5 bg-white">
+    <div
+      v-if="isLoading"
+      class="flex justify-center items-center text-xl font-semibold m-10 text-gray-500"
+    >
+      <ArrowPathIcon class="w-12 mx-3" /> Loading...
+    </div>
+    <div v-else class="w-3/5 mx-auto my-10" style="height: 88vh">
+      <div
+        v-for="post in posts"
+        :key="post.id"
+        class="my-10 shadow shadow-2xl rounded rounded-lg p-5 bg-white"
+      >
         <div class="flex items-center space-x-5">
           <UserIcon class="w-14 rounded rounded-full p-3 bg-gray-400" />
           <div>
-            <h2 class="font-semibold text-xl">jaimip.albiorix@gmail.com</h2>
-            <p class="text-sm text-gray-600 font-semibold">Feb 7, 2025, 3:13:17 PM</p>
+            <h2 class="font-semibold text-xl">{{ post.userId.userName }}</h2>
+            <p class="text-sm text-gray-600 font-semibold">{{ formatDate(post.createdAt) }}</p>
           </div>
         </div>
-        <h3 class="text-2xl font-bold mt-5 mb-3">Syntax support</h3>
-        <p class="text-gray-800 text-lg">
-          Tailwind CSS uses custom CSS syntax like @theme, @variant, and @source, and in some
-          editors this can trigger warnings or errors where these rules aren't recognized. If you're
-          using VS Code, our official Tailwind CSS IntelliSense plugin includes a dedicated Tailwind
-          CSS language mode that has support for all of the custom at-rules and functions Tailwind
-          uses.
-        </p>
+        <h3 class="text-2xl font-bold mt-5 mb-3">{{ post.title }}</h3>
+        <p class="text-gray-800 text-lg">{{ post.description }}</p>
         <hr class="my-3" />
         <div class="font-semibold flex items-center">
           <HeartOutlineIcon class="w-8 text-red-600 cursor-pointer mx-2" v-if="false" />
           <HeartIcon class="w-8 text-red-600 cursor-pointer mx-2" v-else />
-          0 Like |
+          {{ post.likesCount }} Like |
           <ChatBubbleBottomCenterTextIcon
             class="w-8 text-green-600 cursor-pointer mx-2"
             @click="isComment = !isComment"
           />
-          0 Comment
+          {{ post.commentsCount }} Comment
         </div>
         <div v-if="isComment">
           <hr class="my-3" />
