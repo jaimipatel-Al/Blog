@@ -1,14 +1,12 @@
-<script setup lang="ts">
+<script setup>
+import { HeartIcon, XMarkIcon, TrashIcon } from '@heroicons/vue/24/solid'
 import {
-  HeartIcon,
+  UserIcon,
+  ArrowPathIcon,
   ChatBubbleBottomCenterTextIcon,
-  XMarkIcon,
-  TrashIcon,
-  PencilIcon,
-} from '@heroicons/vue/24/solid'
-import { UserIcon, HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
+  HeartIcon as HeartOutlineIcon,
+} from '@heroicons/vue/24/outline'
 import PostComment from '@/components/PostComment.vue'
-import { ref } from 'vue'
 import { formatDate } from '@/composables/format'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
@@ -23,6 +21,8 @@ const props = defineProps({
   postId: { type: String, default: null },
 })
 
+const emit = defineEmits(['getComment'])
+
 const likeComment = async () => {
   props.comment.isLiked = !props.comment.isLiked
 
@@ -31,13 +31,16 @@ const likeComment = async () => {
     type: props.isNested ? 'comment' : 'reply',
   }
   await Axios.post(api.likes, payload)
-    .then(() => {})
+    .then((response) => {
+      const res = response.data.data
+      props.comment.likesCount = res
+    })
     .catch((er) => {
       console.log(er)
     })
 }
 
-const addReplay = async (text: string) => {
+const addReplay = async (text) => {
   props.comment.isAddingComment = true
 
   const payload = {
@@ -49,6 +52,9 @@ const addReplay = async (text: string) => {
   await Axios.post(api.addReply, payload)
     .then((response) => {
       const res = response.data
+      props.comment.replies = res?.data ?? []
+      props.comment.repliesCount = res?.data?.length ?? 0
+
       toast.success(res?.message ?? 'Comment Post Success!')
       return true
     })
@@ -58,6 +64,41 @@ const addReplay = async (text: string) => {
     })
     .finally(() => {
       props.comment.isAddingComment = false
+    })
+}
+
+const deleteComment = async () => {
+  props.comment.isDeleting = true
+
+  await Axios.delete(`${api.deleteComment}${props.comment._id}`)
+    .then((response) => {
+      const res = response.data
+      emit('getComment')
+      toast.success('Comment Deleted Success!')
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+    .finally(() => {
+      props.comment.isDeleting = false
+    })
+}
+
+const deleteReply = async () => {
+  props.comment.isDeleting = true
+
+  await Axios.delete(`${api.deleteReply}${props.comment._id}`)
+    .then((response) => {
+      const res = response.data
+      console.log(res)
+
+      toast.success('Comment Deleted Success!')
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+    .finally(() => {
+      props.comment.isDeleting = false
     })
 }
 </script>
@@ -72,13 +113,13 @@ const addReplay = async (text: string) => {
           <p class="text-xs text-gray-600 font-semibold">{{ formatDate(comment.createdAt) }}</p>
         </div>
       </div>
-      <div class="flex" v-if="authStore?.userData?.userId == comment.userId">
+      <div class="flex" v-if="authStore?.userData?.userId == comment.userId?._id">
         <TrashIcon
+          v-if="!comment?.isDeleting"
+          @click="isNested ? deleteComment() : deleteReply()"
           class="text-red-500 w-12 h-10 py-2 px-3 hover:bg-white hover:shadow hover:shadow-xl rounded rounded-full cursor-pointer"
         />
-        <PencilIcon
-          class="text-blue-500 w-12 h-10 py-2 px-3 hover:bg-white hover:shadow hover:shadow-xl rounded rounded-full cursor-pointer"
-        />
+        <ArrowPathIcon v-else class="text-red-400 w-12 h-10 py-2 px-3 rounded rounded-full" />
       </div>
     </div>
     <p class="text-lg my-3">{{ comment.text }}</p>
@@ -94,13 +135,13 @@ const addReplay = async (text: string) => {
         @click="likeComment()"
       />
       {{ comment.likesCount }} Like
-      <span v-if="props.isNested"> | </span>
+      <span v-if="isNested"> | </span>
       <ChatBubbleBottomCenterTextIcon
-        v-if="props.isNested"
+        v-if="isNested"
         class="w-6 text-green-600 cursor-pointer mx-2"
         @click="comment.isComment = true"
       />
-      <span v-if="props.isNested">{{ comment.repliesCount }} Comment</span>
+      <span v-if="isNested">{{ comment.repliesCount }} Comment</span>
     </div>
     <div
       v-if="comment.isComment"

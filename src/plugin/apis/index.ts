@@ -10,6 +10,8 @@ const requests = {
   getPost: `/posts/post/`,
   deletePost: `/posts/delete/`,
   editPost: `/posts/update/`,
+  deleteComment: `/comments/delete/`,
+  deleteReply: `/replies/delete/`,
 }
 
 export default requests

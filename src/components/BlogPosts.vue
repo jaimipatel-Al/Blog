@@ -1,14 +1,16 @@
-<script setup lang="ts">
+<script setup>
 import {
   UserIcon,
-  ChatBubbleBottomCenterTextIcon,
   HeartIcon,
   XMarkIcon,
   ArrowPathIcon,
   TrashIcon,
   PencilIcon,
 } from '@heroicons/vue/24/solid'
-import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
+import {
+  HeartIcon as HeartOutlineIcon,
+  ChatBubbleBottomCenterTextIcon,
+} from '@heroicons/vue/24/outline'
 import CommentBox from '@/components/CommentBox.vue'
 import PostComment from '@/components/PostComment.vue'
 import { onMounted, ref } from 'vue'
@@ -24,16 +26,24 @@ const authStore = useAuthStore()
 
 const isLoading = ref(false)
 const posts = ref([])
+const page = ref(0)
+const totalPost = ref()
+const scrollComponent = ref()
 
 const getPost = async () => {
+  if (posts.value?.length == totalPost.value) return
+
+  page.value++
   isLoading.value = true
 
-  await Axios.get(`${api.postList}?page=1&limit=25`)
+  await Axios.get(`${api.postList}?page=${page.value}&limit=5`)
     .then((response) => {
-      const res = response.data
-      posts.value = res.data.map((e) => {
+      const res = response.data.data
+      totalPost.value = res.totalPosts
+      const arr = res.posts.map((e) => {
         return { ...e, isComment: false, isAddingComment: false }
       })
+      posts.value = [...posts.value, ...arr]
     })
     .catch((err) => {
       console.log(err)
@@ -43,16 +53,23 @@ const getPost = async () => {
     })
 }
 
+const handleScroll = () => {
+  const element = scrollComponent.value
+  console.log(element)
+
+  if (element.getBoundingClientRect().bottom < window.innerHeight && !isLoading.value) getPost()
+}
+
 const getComment = async (post) => {
   post.isCommentLoading = true
 
   await Axios.get(`${api.getComments}${post._id}`)
     .then((response) => {
-      const res = response.data
-      post.comments = res.data.map((e) => {
+      const res = response.data.data
+      post.comments = res.commentsTree.map((e) => {
         return { ...e, isAddingComment: false }
       })
-      console.log(post.comments)
+      post.commentsCount = res.totalComments
     })
     .catch((err) => {
       console.log(err)
@@ -62,7 +79,7 @@ const getComment = async (post) => {
     })
 }
 
-const addComment = async (post, text: string) => {
+const addComment = async (post, text) => {
   post.isAddingComment = true
 
   const comment = {
@@ -73,8 +90,8 @@ const addComment = async (post, text: string) => {
   await Axios.post(api.addComment, comment)
     .then((response) => {
       const res = response.data
+      getComment(post)
       toast.success(res?.message ?? 'Comment Post Success!')
-      getComment(post, true)
       return true
     })
     .catch((er) => {
@@ -110,6 +127,9 @@ const deletePost = async (post) => {
     .then((response) => {
       const res = response.data
       toast.success(res?.message ?? 'Post Deleted Success!')
+      posts.value = []
+      page.value = 0
+      totalPost.value = 0
       getPost()
     })
     .catch((er) => {
@@ -120,24 +140,23 @@ const deletePost = async (post) => {
     })
 }
 
-const editPost = async (id: string) => {
+const editPost = async (id) => {
   router.push(`/edit-blog/${id}`)
 }
 
 onMounted(() => {
+  scrollComponent.value.addEventListener('scroll', handleScroll)
   getPost()
 })
 </script>
 
 <template>
-  <div class="w-full overflow-y-auto" style="height: 88vh">
-    <div
-      v-if="isLoading"
-      class="flex justify-center items-center text-xl font-semibold m-10 text-gray-500"
-    >
-      <ArrowPathIcon class="w-12 mx-3" /> Loading...
-    </div>
-    <div v-else-if="posts.length" class="w-3/5 mx-auto my-10" style="height: 88vh">
+  <div
+    class="scrolling-component w-full pb-10 overflow-y-auto"
+    ref="scrollComponent"
+    style="height: 88vh"
+  >
+    <div v-if="posts.length" class="w-3/5 mx-auto my-10">
       <div
         v-for="post in posts"
         :key="post._id"
@@ -157,10 +176,7 @@ onMounted(() => {
               class="text-red-600 w-14 h-12 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
               @click="deletePost(post)"
             />
-            <ArrowPathIcon
-              v-else
-              class="text-red-400 w-14 h-12 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
-            />
+            <ArrowPathIcon v-else class="text-red-400 w-14 h-12 py-2 px-3 rounded rounded-full" />
             <PencilIcon
               class="text-blue-600 w-14 h-12 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
               @click="editPost(post._id)"
@@ -209,7 +225,7 @@ onMounted(() => {
               :key="comment._id"
               class="border border-gray-200 shadow shadow-sm rounded rounded-xl p-3 m-5 bg-slate-50"
             >
-              <CommentBox :comment="comment" :postId="post._id" />
+              <CommentBox :comment="comment" :postId="post._id" @getComment="getComment(post)" />
 
               <div
                 v-if="comment.isComment"
@@ -229,10 +245,16 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    <div v-else class="text-center text-xl m-5 font-semibold">
+    <div v-else-if="!posts.length && !isLoading" class="text-center text-xl m-5 font-semibold">
       <img src="@/assets/img/empty.png" alt="Login" class="h-96 w-auto mx-auto my-5" />
       <p class="text-gray-700">No Post Avaiable</p>
       <RouterLink to="/add-blog" class="text-blue-700 underline">Add New Post</RouterLink>
+    </div>
+    <div
+      v-if="isLoading"
+      class="flex justify-center items-center text-xl font-semibold m-10 pb-20 text-gray-500"
+    >
+      <ArrowPathIcon class="w-12 mx-3" /> Loading...
     </div>
   </div>
 </template>
