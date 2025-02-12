@@ -4,6 +4,7 @@ import {
   ChatBubbleBottomCenterTextIcon,
   XMarkIcon,
   TrashIcon,
+  PencilIcon,
 } from '@heroicons/vue/24/solid'
 import { UserIcon, HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import PostComment from '@/components/PostComment.vue'
@@ -27,7 +28,7 @@ const likeComment = async () => {
 
   const payload = {
     targetId: props.comment._id,
-    type: props.isNested ? 'reply' : 'comment',
+    type: props.isNested ? 'comment' : 'reply',
   }
   await Axios.post(api.likes, payload)
     .then(() => {})
@@ -67,14 +68,18 @@ const addReplay = async (text: string) => {
       <div class="flex items-center space-x-3">
         <UserIcon class="w-10 rounded rounded-full p-2 bg-gray-200 border border-gray-500" />
         <div>
-          <h2 class="font-semibold text-md">{{ comment.userId }}</h2>
+          <h2 class="font-semibold text-md">{{ comment.userId.userName }}</h2>
           <p class="text-xs text-gray-600 font-semibold">{{ formatDate(comment.createdAt) }}</p>
         </div>
       </div>
-      <TrashIcon
-        v-if="authStore?.userData?.userId == comment.userId"
-        class="text-red-500 w-12 h-10 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
-      />
+      <div class="flex" v-if="authStore?.userData?.userId == comment.userId">
+        <TrashIcon
+          class="text-red-500 w-12 h-10 py-2 px-3 hover:bg-white hover:shadow hover:shadow-xl rounded rounded-full cursor-pointer"
+        />
+        <PencilIcon
+          class="text-blue-500 w-12 h-10 py-2 px-3 hover:bg-white hover:shadow hover:shadow-xl rounded rounded-full cursor-pointer"
+        />
+      </div>
     </div>
     <p class="text-lg my-3">{{ comment.text }}</p>
     <div class="font-semibold flex items-center">

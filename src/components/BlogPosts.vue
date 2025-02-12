@@ -6,6 +6,7 @@ import {
   XMarkIcon,
   ArrowPathIcon,
   TrashIcon,
+  PencilIcon,
 } from '@heroicons/vue/24/solid'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import CommentBox from '@/components/CommentBox.vue'
@@ -17,6 +18,7 @@ import { formatDate } from '@/composables/format'
 import toast from '@/plugin/toast'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import router from '@/router'
 
 const authStore = useAuthStore()
 
@@ -26,7 +28,7 @@ const posts = ref([])
 const getPost = async () => {
   isLoading.value = true
 
-  await Axios.get(api.postList)
+  await Axios.get(`${api.postList}?page=1&limit=25`)
     .then((response) => {
       const res = response.data
       posts.value = res.data.map((e) => {
@@ -92,10 +94,34 @@ const likePost = async (post) => {
     type: 'post',
   }
   await Axios.post(api.likes, payload)
-    .then(() => {})
+    .then((response) => {
+      const res = response.data.data
+      post.likesCount = res
+    })
     .catch((er) => {
       console.log(er)
     })
+}
+
+const deletePost = async (post) => {
+  post.isDeleting = true
+
+  await Axios.delete(`${api.deletePost}${post._id}`)
+    .then((response) => {
+      const res = response.data
+      toast.success(res?.message ?? 'Post Deleted Success!')
+      getPost()
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+    .finally(() => {
+      post.isDeleting = false
+    })
+}
+
+const editPost = async (id: string) => {
+  router.push(`/edit-blog/${id}`)
 }
 
 onMounted(() => {
@@ -125,10 +151,21 @@ onMounted(() => {
               <p class="text-sm text-gray-600 font-semibold">{{ formatDate(post.createdAt) }}</p>
             </div>
           </div>
-          <TrashIcon
-            v-if="authStore?.userData?.userId == post.userId"
-            class="text-red-600 w-14 h-12 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
-          />
+          <div v-if="authStore?.userData?.userId == post.userId" class="flex">
+            <TrashIcon
+              v-if="!post?.isDeleting"
+              class="text-red-600 w-14 h-12 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
+              @click="deletePost(post)"
+            />
+            <ArrowPathIcon
+              v-else
+              class="text-red-400 w-14 h-12 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
+            />
+            <PencilIcon
+              class="text-blue-600 w-14 h-12 py-2 px-3 hover:bg-gray-200 rounded rounded-full cursor-pointer"
+              @click="editPost(post._id)"
+            />
+          </div>
         </div>
         <h3 class="text-2xl font-bold mt-5 mb-3">{{ post.title }}</h3>
         <p class="text-gray-800 text-lg">{{ post.description }}</p>

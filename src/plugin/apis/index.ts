@@ -7,6 +7,8 @@ const requests = {
   getComments: `comments/get-comments/`,
   likes: `/likes/like-unlike`,
   addReply: `/replies/add-reply`,
+  deletePost: `/posts/delete/`,
+  editPost: `/posts/update/`,
 }
 
 export default requests
