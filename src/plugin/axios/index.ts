@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const token = localStorage.getItem('token')
+import { useAuthStore } from '@/stores/authStore'
+const authStore = useAuthStore()
+const token = authStore.token
 
 const instance = axios.create({
   baseURL: 'https://social-media-backend-bwrz.onrender.com/',
