@@ -7,6 +7,7 @@ const requests = {
   getComments: `comments/get-comments/`,
   likes: `/likes/like-unlike`,
   addReply: `/replies/add-reply`,
+  getPost: `/posts/post/`,
   deletePost: `/posts/delete/`,
   editPost: `/posts/update/`,
 }
