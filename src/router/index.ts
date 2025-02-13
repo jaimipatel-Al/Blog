@@ -1,48 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { routes } from './routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/login',
-      name: 'Login',
-      component: () => import('@/views/LogIn.vue'),
-      meta: { auth: false },
-    },
-    {
-      path: '/signup',
-      name: 'Signup',
-      component: () => import('@/views/SignUp.vue'),
-      meta: { auth: false },
-    },
-    {
-      path: '/',
-      name: 'Dashboard',
-      component: () => import('@/views/MainDashboard.vue'),
-      meta: { auth: true },
-    },
-    {
-      path: '/add-blog',
-      name: 'Add-Blog',
-      component: () => import('@/views/AddEditBlog.vue'),
-      meta: { auth: true },
-    },
-    {
-      path: '/edit-blog/:id',
-      name: 'Edit-Blog',
-      component: () => import('@/views/AddEditBlog.vue'),
-      meta: { auth: true },
-    },
-  ],
+  routes,
 })
 
 const currentUser = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const authStore = useAuthStore()
     const token = authStore.token
     resolve(token)
-    reject
   })
 }
 

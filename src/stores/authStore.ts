@@ -2,10 +2,21 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useAuthStore = defineStore('user', () => {
-  const userData = ref(JSON.parse(localStorage.getItem('blogUser')))
+  interface loginCredentials {
+    userName: string
+    password: string
+    userId: string
+  }
+
+  interface sessionCredentials {
+    userName: string
+    password: string
+  }
+
+  const userData = ref(JSON.parse(localStorage.getItem('blogUser') || '{}'))
   const token = ref(localStorage.getItem('token'))
 
-  const loginUser = (credentials) => {
+  const loginUser = (credentials: loginCredentials) => {
     userData.value = credentials
     localStorage.setItem('blogUser', JSON.stringify(userData.value))
   }
@@ -25,7 +36,7 @@ export const useAuthStore = defineStore('user', () => {
     localStorage.removeItem('blogUser')
   }
 
-  const sessionStore = (credentials) => {
+  const sessionStore = (credentials: sessionCredentials) => {
     sessionStorage.setItem('authCredentials', JSON.stringify(credentials))
   }
 

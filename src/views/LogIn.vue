@@ -36,6 +36,7 @@ const login = async () => {
   const credentials = {
     userName: userName.value,
     password: password.value,
+    userId: '',
   }
 
   await Axios.post(api.login, credentials)
