@@ -28,10 +28,13 @@ const logout = () => {
       style="height: 8vh; min-height: 50px"
     >
       <h1 class="text-5xl mx-10 font-bold text-blue-900">Write Blog</h1>
-      <ArrowLeftStartOnRectangleIcon
-        class="w-14 mx-5 p-3 rounded rounded-full cursor-pointer hover:bg-blue-50"
+      <div
+        class="flex items-center text-xl font-semibold mx-5 py-3 px-5 rounded rounded-full hover:bg-blue-50 cursor-pointer"
         @click="logout()"
-      />
+      >
+        <ArrowLeftStartOnRectangleIcon class="w-10" />
+        Logout
+      </div>
     </nav>
     <BlogPosts />
     <button

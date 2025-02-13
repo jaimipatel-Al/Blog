@@ -235,7 +235,7 @@ onMounted(() => {
                   :is-nested="false"
                   :comment="reply"
                   :postId="post._id"
-                  @reLoadReplay="(val) => (comment.replies = val)"
+                  @reLoadReplay="(val) => (comment.replies = val,comment.repliesCount=val?.length??0)"
                 />
               </div>
             </div>

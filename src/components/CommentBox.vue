@@ -140,7 +140,7 @@ const deleteReply = async () => {
         class="w-6 text-green-600 cursor-pointer mx-2"
         @click="comment.isComment = true"
       />
-      <span v-if="isNested">{{ comment.repliesCount }} Comment</span>
+      <span v-if="isNested">{{ comment.repliesCount }} Reply</span>
     </div>
     <div
       v-if="comment.isComment"

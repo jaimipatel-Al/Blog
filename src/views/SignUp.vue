@@ -63,7 +63,7 @@ const signup = async () => {
 
 <template>
   <div class="container mx-auto my-10 flex justify-center space-x-10" style="height: 80vh">
-    <div class="shadow-2xl py-6 my-4 px-10 mx-10 rounded rounded-3xl w-full">
+    <div class="shadow-2xl py-6 my-4 px-10 mx-10 rounded rounded-3xl w-2/5">
       <h2 class="main-title">Sign Up</h2>
       <p class="semi-title">
         Already have an account?
@@ -127,6 +127,6 @@ const signup = async () => {
         </button>
       </Form>
     </div>
-    <img src="@/assets/img/signup.png" alt="Login" />
+    <img src="@/assets/img/signup.png" alt="Sign Up" />
   </div>
 </template>
