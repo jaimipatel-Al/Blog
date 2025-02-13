@@ -55,8 +55,6 @@ const getPost = async () => {
 
 const handleScroll = () => {
   const element = scrollComponent.value
-  console.log(element)
-
   if (element.getBoundingClientRect().bottom < window.innerHeight && !isLoading.value) getPost()
 }
 
@@ -233,7 +231,12 @@ onMounted(() => {
                 :key="reply._id"
                 class="border border-gray-200 shadow shadow-sm rounded rounded-xl p-3 m-5 bg-white"
               >
-                <CommentBox :is-nested="false" :comment="reply" :postId="post._id" />
+                <CommentBox
+                  :is-nested="false"
+                  :comment="reply"
+                  :postId="post._id"
+                  @reLoadReplay="(val) => (comment.replies = val)"
+                />
               </div>
             </div>
             <hr class="my-3" />

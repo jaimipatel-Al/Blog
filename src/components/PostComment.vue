@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { ref } from 'vue'

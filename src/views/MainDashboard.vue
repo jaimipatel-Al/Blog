@@ -1,5 +1,5 @@
 
-<script setup lang="ts">
+<script setup >
 import { PlusIcon, ArrowLeftStartOnRectangleIcon } from '@heroicons/vue/24/solid'
 import { useRouter } from 'vue-router'
 import BlogPosts from '@/components/BlogPosts.vue'
@@ -16,8 +16,8 @@ const createBlog = () => {
 const logout = () => {
   authStore.logOut()
   authStore.removeToken()
-  router.push('/login')
   toast.success('User Logged Out successfully')
+  router.push('/login')
 }
 </script>
 

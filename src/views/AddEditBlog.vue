@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ArrowPathIcon } from '@heroicons/vue/24/solid'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { Form, Field } from 'vee-validate'

@@ -21,7 +21,7 @@ const props = defineProps({
   postId: { type: String, default: null },
 })
 
-const emit = defineEmits(['getComment'])
+const emit = defineEmits(['getComment', 'reLoadReplay'])
 
 const likeComment = async () => {
   props.comment.isLiked = !props.comment.isLiked
@@ -89,9 +89,8 @@ const deleteReply = async () => {
 
   await Axios.delete(`${api.deleteReply}${props.comment._id}`)
     .then((response) => {
-      const res = response.data
-      console.log(res)
-
+      const res = response.data.data
+      emit('reLoadReplay', res)
       toast.success('Comment Deleted Success!')
     })
     .catch((er) => {

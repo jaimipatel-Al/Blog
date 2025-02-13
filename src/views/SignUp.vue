@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup >
 import { EyeIcon, EyeSlashIcon, ArrowPathIcon } from '@heroicons/vue/24/solid'
 import { RouterLink, useRouter } from 'vue-router'
 import { ref } from 'vue'
