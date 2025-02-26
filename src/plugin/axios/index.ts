@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 
 const instance = axios.create({
-  baseURL: 'https://social-media-backend-bwrz.onrender.com/',
+  baseURL: import.meta.env.VITE_API_BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   },
