@@ -1,6 +1,19 @@
 # Social Media
 
-This template should help get you started developing with Vue 3 in Vite.
+The Social Media Website is a feature-rich blog platform built using Vue.js. It provides a seamless user experience with functionalities like user authentication, post creation, commenting, replying, and interactive engagement through likes. Users can manage their own content while interacting with others in a structured and user-friendly interface.
+
+## Features
+
+### **User Authentication**
+
+- Secure **sign-up** and **login** system.
+- Ensures only **authenticated users** can interact with posts and comments.
+
+### **Post, Comment, Reply Management**
+
+- **Create, Edit & Delete**: Users can create, update, and remove their own posts, comments, and replies.
+- **Engagement**: Users can **like** posts, comments, and replies.
+- **Discussion**: Users can comment on posts and reply to comments for interactive conversations.
 
 ## Recommended IDE Setup
 
@@ -37,3 +50,17 @@ npm run build
 ```sh
 npm run lint
 ```
+
+### Tech Stack
+
+- **Frontend:** Vue 3, Vite, Tailwind CSS
+- **State Management:** Pinia
+- **Validation:** vee-validate, yup
+- **Infinite Loader:** vue-infinite-scroll
+- **Notifications:** vue-toast-notification, vue-sweetalert2
+- **API Calls:** axios
+
+## GitHub Repository
+
+- See [GitHub](https://github.com/jaimipatel-Al/Blog)
+- See [Link](https://blog-post-758c8.web.app/)
