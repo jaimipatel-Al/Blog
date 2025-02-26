@@ -64,3 +64,4 @@ npm run lint
 
 - See [GitHub](https://github.com/jaimipatel-Al/Blog)
 - See [Link](https://blog-post-758c8.web.app/)
+- See [Swagger](https://social-media-backend-bwrz.onrender.com/api-docs)
