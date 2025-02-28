@@ -1,41 +1,39 @@
 <script setup>
-import { Form, Field } from 'vee-validate'
-import * as yup from 'yup'
-import { ref } from 'vue'
-import { ArrowPathIcon } from '@heroicons/vue/24/solid'
+  import { Form, Field } from 'vee-validate'
+  import * as yup from 'yup'
+  import { ref } from 'vue'
+  import { ArrowPathIcon } from '@heroicons/vue/24/solid'
 
-const props = defineProps({
-  loading: { type: Boolean, default: true },
-})
-const emit = defineEmits(['addComment'])
+  const props = defineProps({
+    loading: { type: Boolean, default: true },
+  })
+  const emit = defineEmits(['addComment'])
 
-const schema = yup.object({
-  Comment: yup.string().required().max(100),
-})
+  const schema = yup.object({
+    Comment: yup.string().required().max(100),
+  })
 
-const comment = ref('')
-const formRef = ref()
+  const comment = ref('')
+  const formRef = ref()
 
-const sendComment = async () => {
-  await emit('addComment', comment.value)
-  formRef.value.resetForm()
-}
+  const sendComment = async () => {
+    await emit('addComment', comment.value)
+    formRef.value.resetForm()
+  }
 </script>
 
 <template>
   <Form ref="formRef" @submit="sendComment" :validation-schema="schema" v-slot="{ errors }">
     <Field v-model="comment" v-slot="{ field }" name="Comment">
-      <textarea v-bind="field" class="input h-32" placeholder="Enter Your Comment"></textarea>
+      <textarea v-bind="field" class="input h-20 sm:h-24 md:h-32" placeholder="Enter Your Comment"></textarea>
     </Field>
     <p class="error-message">{{ errors?.Comment }}</p>
 
     <div class="flex justify-end">
-      <button
-        type="submit"
-        class="sm-button flex justify-center items-center"
-        :disabled="props.loading"
-      >
-        Add Comment <ArrowPathIcon v-if="props.loading" class="w-6 ml-3" />
+      <button type="submit" class="sm-button flex justify-center items-center text-xs sm:text-sm md:text-base"
+        :disabled="props.loading">
+        Add Comment
+        <ArrowPathIcon v-if="props.loading" class="w-4 sm:w-5 md:w-6 ml-1 sm:wl-2 md:ml-3" />
       </button>
     </div>
   </Form>
